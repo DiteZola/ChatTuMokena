@@ -2,210 +2,610 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TuMokena Kueto</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Segoe UI',Tahoma,sans-serif;background:#080812;color:#fff;height:100vh;overflow:hidden}
-
-        /* AUTH */
-        #authScreen{display:flex;justify-content:center;align-items:center;height:100vh;background:linear-gradient(135deg,#080812,#12122a,#0d2847)}
-        #authScreen.off{display:none}
-        #chatScreen{display:none;height:100vh;flex-direction:column}
-        #chatScreen.on{display:flex}
-
-        .auth-box{background:rgba(20,20,40,0.96);border:1px solid rgba(108,99,255,0.18);border-radius:22px;padding:36px 32px;width:420px;max-width:95vw;box-shadow:0 24px 80px rgba(0,0,0,0.7)}
-        .auth-box h1{text-align:center;font-size:28px;background:linear-gradient(135deg,#6C63FF,#FF6584);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:2px}
-        .auth-box .sub{text-align:center;color:#666;font-size:12px;margin-bottom:24px}
-
-        .tabs{display:flex;background:#0a0a16;border-radius:13px;padding:3px;margin-bottom:22px}
-        .tabs button{flex:1;padding:10px;border:none;background:transparent;color:#666;font-size:14px;font-weight:700;border-radius:11px;cursor:pointer;transition:.3s}
-        .tabs button.on{background:#6C63FF;color:#fff;box-shadow:0 3px 12px rgba(108,99,255,0.35)}
-
-        .fld{margin-bottom:14px}
-        .fld label{display:block;font-size:10px;font-weight:800;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:.7px}
-        .fld input{width:100%;padding:12px 14px;background:#0a0a16;border:2px solid rgba(108,99,255,0.12);border-radius:10px;color:#fff;font-size:14px;outline:none;transition:.3s}
-        .fld input:focus{border-color:#6C63FF}
-
-        .av-area{text-align:center;margin-bottom:16px}
-        .av-circ{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#6C63FF,#FF6584);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:30px;cursor:pointer;overflow:hidden;border:3px solid rgba(108,99,255,0.25);transition:.3s}
-        .av-circ:hover{transform:scale(1.06);border-color:#6C63FF}
-        .av-circ img{width:100%;height:100%;object-fit:cover}
-        .av-area small{color:#555;font-size:10px}
-
-        .btn-go{width:100%;padding:13px;background:linear-gradient(135deg,#6C63FF,#5249cc);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:.3s;margin-top:6px}
-        .btn-go:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(108,99,255,0.35)}
-        .btn-go:disabled{opacity:.5;cursor:wait;transform:none}
-
-        .alrt{padding:10px 14px;border-radius:10px;font-size:12px;margin-bottom:14px;display:none;line-height:1.4}
-        .alrt.er{background:rgba(255,60,60,0.1);border:1px solid rgba(255,60,60,0.25);color:#ff5252}
-        .alrt.ok{background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.25);color:#00c853}
-        .alrt.inf{background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.25);color:#9e99ff}
-
-        /* CHAT HEADER */
-        .ch-top{background:rgba(20,20,40,0.97);border-bottom:1px solid rgba(108,99,255,0.1);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:6px}
-        .ch-top-l{display:flex;align-items:center;gap:12px}
-        .ch-top h2{font-size:18px;background:linear-gradient(135deg,#6C63FF,#FF6584);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .bdg{background:rgba(0,230,118,0.12);color:#00E676;padding:4px 10px;border-radius:14px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:4px}
-        .bdg::before{content:'';width:6px;height:6px;background:#00E676;border-radius:50%;animation:bl 2s infinite}
-        @keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
-
-        .ch-top-r{display:flex;align-items:center;gap:8px}
-        .me-b{display:flex;align-items:center;gap:7px;background:rgba(108,99,255,0.08);padding:5px 12px;border-radius:12px}
-        .me-b img{width:28px;height:28px;border-radius:50%;object-fit:cover}
-        .me-b .ml{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff}
-        .me-b span{font-weight:600;font-size:12px}
-
-        .bt-out{background:rgba(255,60,60,0.12);border:1px solid rgba(255,60,60,0.2);color:#ff5252;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;transition:.3s}
-        .bt-out:hover{background:rgba(255,60,60,0.22)}
-
-        .ch-body{display:flex;flex:1;overflow:hidden}
-
-        /* SIDEBAR */
-        .sbar{width:240px;background:rgba(20,20,40,0.4);border-right:1px solid rgba(108,99,255,0.06);flex-shrink:0;display:flex;flex-direction:column}
-        .sbar h3{padding:14px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#666;border-bottom:1px solid rgba(108,99,255,0.06)}
-        .sbar-ls{flex:1;overflow-y:auto;padding:6px}
-        .sbar-ls::-webkit-scrollbar{width:4px}
-        .sbar-ls::-webkit-scrollbar-thumb{background:rgba(108,99,255,0.15);border-radius:2px}
-
-        .su{display:flex;align-items:center;gap:9px;padding:8px;border-radius:10px;margin-bottom:1px;transition:.2s}
-        .su:hover{background:rgba(108,99,255,0.05)}
-        .su img{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0}
-        .su .sl{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
-        .su .sn{font-weight:600;font-size:12px}
-        .su .ss{font-size:9px;color:#00E676}
-
-        /* MESSAGES */
-        .m-area{flex:1;display:flex;flex-direction:column;min-width:0}
-        .m-list{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:1px}
-        .m-list::-webkit-scrollbar{width:4px}
-        .m-list::-webkit-scrollbar-thumb{background:rgba(108,99,255,0.18);border-radius:2px}
-
-        /* WELCOME MSG */
-        .welcome-msg{text-align:center;padding:40px 20px;color:#555}
-        .welcome-msg .wicon{font-size:60px;margin-bottom:12px}
-        .welcome-msg h3{color:#888;font-size:18px;margin-bottom:6px}
-        .welcome-msg p{font-size:12px;color:#555;max-width:300px;margin:0 auto}
-
-        /* MESSAGE BUBBLE */
-        .msg{display:flex;gap:8px;max-width:78%;animation:mIn .25s ease;position:relative}
-        .msg.gs{margin-top:14px}
-        @keyframes mIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-        .msg.my{align-self:flex-end;flex-direction:row-reverse}
-        .msg .mav{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;align-self:flex-start;margin-top:2px}
-        .msg .mlt{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;flex-shrink:0;align-self:flex-start;margin-top:2px}
-        .msg .msp{width:34px;flex-shrink:0}
-        .msg .mwr{display:flex;flex-direction:column;min-width:0}
-        .msg .mwh{font-weight:700;font-size:11.5px;margin-bottom:1px;padding-left:3px}
-        .msg.my .mwh{text-align:right;padding-right:3px;padding-left:0}
-
-        .msg .mbub{padding:8px 12px;border-radius:14px;font-size:13.5px;line-height:1.45;word-wrap:break-word;overflow-wrap:break-word;position:relative;min-width:50px}
-        .msg:not(.my) .mbub{background:rgba(28,28,52,0.95);border:1px solid rgba(255,255,255,0.03);border-top-left-radius:3px}
-        .msg.my .mbub{border-top-right-radius:3px;color:#fff}
-
-        .msg .mbub .mtm{display:block;font-size:9px;opacity:.45;margin-top:3px;text-align:right}
-        .msg .mbub img.mpc{max-width:250px;max-height:250px;border-radius:8px;margin-top:4px;cursor:pointer;display:block;transition:.2s}
-        .msg .mbub img.mpc:hover{opacity:.85}
-
-        /* REACTIONS */
-        .react-bar{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
-        .msg.my .react-bar{justify-content:flex-end}
-        .react-btn{display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);cursor:pointer;transition:.2s;font-size:12px;color:#aaa}
-        .react-btn:hover{background:rgba(108,99,255,0.15);border-color:rgba(108,99,255,0.3)}
-        .react-btn.active{background:rgba(108,99,255,0.2);border-color:rgba(108,99,255,0.4)}
-        .react-btn .rcount{font-size:10px;font-weight:700;min-width:8px;text-align:center}
-        .react-btn .ricon{font-size:14px}
-
-        /* ADD REACTION BTN */
-        .add-react{opacity:0;transition:.2s;position:absolute;right:-30px;top:50%;transform:translateY(-50%)}
-        .msg.my .add-react{right:auto;left:-30px}
-        .msg:hover .add-react{opacity:1}
-        .add-react button{width:24px;height:24px;border-radius:50%;border:none;background:rgba(108,99,255,0.12);color:#888;font-size:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center}
-        .add-react button:hover{background:rgba(108,99,255,0.3);color:#fff}
-
-        /* REACTION PICKER */
-        .rpick{display:none;position:absolute;background:rgba(28,28,52,0.98);border:1px solid rgba(108,99,255,0.2);border-radius:14px;padding:6px 8px;box-shadow:0 8px 30px rgba(0,0,0,0.5);z-index:200;white-space:nowrap}
-        .rpick.on{display:flex;gap:2px;animation:mIn .15s ease}
-        .rpick button{width:32px;height:32px;border:none;background:transparent;font-size:20px;cursor:pointer;border-radius:8px;transition:.15s}
-        .rpick button:hover{background:rgba(108,99,255,0.2);transform:scale(1.2)}
-
-        /* REPLY PREVIEW */
-        .reply-preview{display:none;padding:8px 12px;background:rgba(108,99,255,0.08);border-left:3px solid #6C63FF;border-radius:0 8px 8px 0;margin-bottom:8px;font-size:12px;position:relative}
-        .reply-preview.on{display:block}
-        .reply-preview .rp-name{font-weight:700;color:#6C63FF;font-size:11px}
-        .reply-preview .rp-text{color:#999;margin-top:2px;max-height:30px;overflow:hidden}
-        .reply-preview .rp-close{position:absolute;right:8px;top:8px;background:none;border:none;color:#888;cursor:pointer;font-size:14px}
-
-        /* REPLY IN BUBBLE */
-        .reply-ref{background:rgba(108,99,255,0.08);border-left:2px solid #6C63FF;border-radius:0 6px 6px 0;padding:4px 8px;margin-bottom:4px;font-size:11px;cursor:pointer}
-        .reply-ref .rr-name{font-weight:700;color:#6C63FF;font-size:10px}
-        .reply-ref .rr-text{color:#888;max-height:18px;overflow:hidden}
-
-        /* SYS MSG */
-        .sys{text-align:center;padding:6px}
-        .sys span{background:rgba(108,99,255,0.07);padding:4px 12px;border-radius:14px;font-size:10px;color:#666;display:inline-block}
-
-        /* TYPING */
-        .tbar{padding:2px 16px;font-size:10px;color:#666;font-style:italic;min-height:14px;flex-shrink:0}
-
-        /* INPUT */
-        .ibar{background:rgba(20,20,40,0.97);border-top:1px solid rgba(108,99,255,0.1);padding:10px 16px;flex-shrink:0;position:relative}
-
-        .ebox{display:none;position:absolute;bottom:64px;left:16px;background:rgba(28,28,52,0.98);border:1px solid rgba(108,99,255,0.18);border-radius:14px;padding:12px;box-shadow:0 8px 30px rgba(0,0,0,0.5);z-index:300;width:290px}
-        .ebox.on{display:block;animation:mIn .15s ease}
-        .egrid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-height:160px;overflow-y:auto}
-        .egrid button{width:32px;height:32px;border:none;background:transparent;font-size:18px;cursor:pointer;border-radius:6px;transition:.15s}
-        .egrid button:hover{background:rgba(108,99,255,0.2);transform:scale(1.15)}
-
-        .ipv{display:none;align-items:center;gap:8px;padding-bottom:8px}
-        .ipv.on{display:flex}
-        .ipv img{width:50px;height:50px;border-radius:6px;object-fit:cover;border:2px solid #6C63FF}
-        .ipv button{width:22px;height:22px;border-radius:50%;border:none;background:rgba(255,60,60,0.2);color:#ff5252;cursor:pointer;font-size:11px}
-
-        .irow{display:flex;gap:6px;align-items:flex-end}
-        .ibtns{display:flex;gap:3px}
-        .ib{width:38px;height:38px;border-radius:10px;border:none;background:rgba(108,99,255,0.12);color:#6C63FF;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.3s}
-        .ib:hover{background:rgba(108,99,255,0.22)}
-
-        .iwrap{flex:1}
-        .iwrap textarea{width:100%;padding:10px 14px;background:#0a0a16;border:2px solid rgba(108,99,255,0.12);border-radius:12px;color:#fff;font-size:13px;outline:none;resize:none;height:38px;max-height:90px;font-family:inherit;transition:.3s}
-        .iwrap textarea:focus{border-color:#6C63FF}
-
-        .sbtn{width:38px;height:38px;border-radius:10px;border:none;background:linear-gradient(135deg,#6C63FF,#5249cc);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.3s;box-shadow:0 3px 10px rgba(108,99,255,0.25)}
-        .sbtn:hover{transform:scale(1.06)}
-
-        /* MODAL */
-        .modbg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.94);z-index:999;justify-content:center;align-items:center;cursor:pointer}
-        .modbg.on{display:flex}
-        .modbg img{max-width:92%;max-height:92%;border-radius:8px}
-
-        /* SCROLL TOP BTN */
-        .scroll-bot{position:fixed;bottom:80px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(108,99,255,0.9);border:none;color:#fff;font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:.3s}
-        .scroll-bot.on{display:flex}
-        .scroll-bot:hover{transform:scale(1.1)}
-
-        /* UNREAD BADGE */
-        .unread-badge{position:absolute;top:-6px;right:-6px;background:#ff5252;color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:8px;min-width:16px;text-align:center}
-
-        @media(max-width:768px){
-            .sbar{display:none}
-            .msg{max-width:92%}
-            .me-b span{display:none}
-            .ebox{width:260px;left:8px}
-            .ch-top{padding:8px 12px}
-            .msg .mbub img.mpc{max-width:200px;max-height:200px}
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* STATUS BAR */
-        .status-bar{text-align:center;padding:6px;background:rgba(108,99,255,0.06);font-size:10px;color:#666;flex-shrink:0;display:none}
-        .status-bar.on{display:block}
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
 
-        .dbg{position:fixed;bottom:2px;left:2px;font-size:8px;color:#222;z-index:1}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #080812;
+            color: #fff;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        /* ===== AUTH ===== */
+        #authScreen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #080812, #12122a, #0d2847);
+            z-index: 500;
+            overflow-y: auto;
+        }
+        #authScreen.off { display: none; }
+
+        #chatScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            flex-direction: column;
+            z-index: 1;
+        }
+        #chatScreen.on { display: flex; }
+
+        .auth-box {
+            background: rgba(20,20,40,0.96);
+            border: 1px solid rgba(108,99,255,0.18);
+            border-radius: 22px;
+            padding: 32px 28px;
+            width: 400px;
+            max-width: 94vw;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+            margin: 20px;
+        }
+        .auth-box h1 {
+            text-align: center;
+            font-size: 26px;
+            background: linear-gradient(135deg, #6C63FF, #FF6584);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2px;
+        }
+        .auth-box .sub {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 22px;
+        }
+        .tabs {
+            display: flex;
+            background: #0a0a16;
+            border-radius: 13px;
+            padding: 3px;
+            margin-bottom: 20px;
+        }
+        .tabs button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .tabs button.on {
+            background: #6C63FF;
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(108,99,255,0.35);
+        }
+        .fld { margin-bottom: 12px; }
+        .fld label {
+            display: block;
+            font-size: 10px;
+            font-weight: 800;
+            color: #888;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+        .fld input {
+            width: 100%;
+            padding: 11px 13px;
+            background: #0a0a16;
+            border: 2px solid rgba(108,99,255,0.12);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .fld input:focus { border-color: #6C63FF; }
+
+        .av-area { text-align: center; margin-bottom: 14px; }
+        .av-circ {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6C63FF, #FF6584);
+            margin: 0 auto 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; cursor: pointer; overflow: hidden;
+            border: 3px solid rgba(108,99,255,0.25);
+            transition: 0.3s;
+        }
+        .av-circ:hover { transform: scale(1.06); border-color: #6C63FF; }
+        .av-circ img { width: 100%; height: 100%; object-fit: cover; }
+        .av-area small { color: #555; font-size: 10px; }
+
+        .btn-go {
+            width: 100%; padding: 12px;
+            background: linear-gradient(135deg, #6C63FF, #5249cc);
+            border: none; border-radius: 12px;
+            color: #fff; font-size: 15px; font-weight: 700;
+            cursor: pointer; transition: 0.3s; margin-top: 6px;
+        }
+        .btn-go:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108,99,255,0.35); }
+        .btn-go:disabled { opacity: 0.5; cursor: wait; transform: none; }
+
+        .alrt {
+            padding: 9px 12px; border-radius: 10px;
+            font-size: 12px; margin-bottom: 12px;
+            display: none; line-height: 1.4;
+        }
+        .alrt.er { background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.25); color: #ff5252; }
+        .alrt.ok { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.25); color: #00c853; }
+        .alrt.inf { background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.25); color: #9e99ff; }
+
+        /* ===== CHAT LAYOUT - FIXED ===== */
+        .ch-top {
+            background: rgba(20,20,40,0.98);
+            border-bottom: 1px solid rgba(108,99,255,0.1);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 6px;
+            z-index: 20;
+        }
+        .ch-top-l { display: flex; align-items: center; gap: 10px; }
+        .ch-top h2 {
+            font-size: 17px;
+            background: linear-gradient(135deg, #6C63FF, #FF6584);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .bdg {
+            background: rgba(0,230,118,0.12);
+            color: #00E676; padding: 3px 9px;
+            border-radius: 12px; font-size: 10px; font-weight: 700;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .bdg::before {
+            content: ''; width: 6px; height: 6px;
+            background: #00E676; border-radius: 50%;
+            animation: bl 2s infinite;
+        }
+        @keyframes bl { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+        .ch-top-r { display: flex; align-items: center; gap: 6px; }
+        .me-b {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(108,99,255,0.08);
+            padding: 4px 10px; border-radius: 10px;
+        }
+        .me-b img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+        .me-b .ml {
+            width: 26px; height: 26px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 11px; color: #fff;
+        }
+        .me-b span { font-weight: 600; font-size: 12px; }
+
+        .bt-out {
+            background: rgba(255,60,60,0.12);
+            border: 1px solid rgba(255,60,60,0.2);
+            color: #ff5252; padding: 6px 12px;
+            border-radius: 8px; cursor: pointer;
+            font-size: 11px; font-weight: 700; transition: 0.3s;
+        }
+        .bt-out:hover { background: rgba(255,60,60,0.22); }
+
+        /* CHAT BODY - KEY FIX */
+        .ch-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* SIDEBAR */
+        .sbar {
+            width: 220px;
+            background: rgba(20,20,40,0.4);
+            border-right: 1px solid rgba(108,99,255,0.06);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .sbar h3 {
+            padding: 12px; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: #666; border-bottom: 1px solid rgba(108,99,255,0.06);
+            flex-shrink: 0;
+        }
+        .sbar-ls {
+            flex: 1; overflow-y: auto; padding: 6px;
+        }
+        .sbar-ls::-webkit-scrollbar { width: 3px; }
+        .sbar-ls::-webkit-scrollbar-thumb { background: rgba(108,99,255,0.15); border-radius: 2px; }
+
+        .su {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 8px; border-radius: 8px; margin-bottom: 1px;
+        }
+        .su:hover { background: rgba(108,99,255,0.05); }
+        .su img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .su .sl {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 12px; color: #fff; flex-shrink: 0;
+        }
+        .su .sn { font-weight: 600; font-size: 12px; }
+        .su .ss { font-size: 9px; color: #00E676; }
+
+        /* MSG AREA - KEY FIX */
+        .m-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* MESSAGE LIST */
+        .m-list {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-height: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .m-list::-webkit-scrollbar { width: 4px; }
+        .m-list::-webkit-scrollbar-thumb { background: rgba(108,99,255,0.18); border-radius: 2px; }
+
+        .welcome-msg {
+            text-align: center; padding: 30px 16px; color: #555;
+            margin: auto 0;
+        }
+        .welcome-msg .wicon { font-size: 50px; margin-bottom: 10px; }
+        .welcome-msg h3 { color: #888; font-size: 16px; margin-bottom: 4px; }
+        .welcome-msg p { font-size: 11px; color: #555; max-width: 280px; margin: 0 auto; }
+
+        /* MSG BUBBLE */
+        .msg {
+            display: flex; gap: 8px; max-width: 78%;
+            animation: mIn 0.25s ease; position: relative;
+        }
+        .msg.gs { margin-top: 12px; }
+        @keyframes mIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+        .msg.my { align-self: flex-end; flex-direction: row-reverse; }
+        .msg .mav {
+            width: 32px; height: 32px; border-radius: 50%;
+            object-fit: cover; flex-shrink: 0; align-self: flex-start; margin-top: 2px;
+        }
+        .msg .mlt {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 11px; color: #fff;
+            flex-shrink: 0; align-self: flex-start; margin-top: 2px;
+        }
+        .msg .msp { width: 32px; flex-shrink: 0; }
+        .msg .mwr { display: flex; flex-direction: column; min-width: 0; max-width: 100%; }
+        .msg .mwh { font-weight: 700; font-size: 11px; margin-bottom: 1px; padding-left: 3px; }
+        .msg.my .mwh { text-align: right; padding-right: 3px; padding-left: 0; }
+
+        .msg .mbub {
+            padding: 8px 12px; border-radius: 14px;
+            font-size: 13px; line-height: 1.45;
+            word-wrap: break-word; overflow-wrap: break-word;
+            min-width: 40px;
+        }
+        .msg:not(.my) .mbub {
+            background: rgba(28,28,52,0.95);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-top-left-radius: 3px;
+        }
+        .msg.my .mbub { border-top-right-radius: 3px; color: #fff; }
+
+        .msg .mbub .mtm { display: block; font-size: 9px; opacity: 0.45; margin-top: 3px; text-align: right; }
+        .msg .mbub img.mpc {
+            max-width: 240px; max-height: 240px;
+            border-radius: 8px; margin-top: 4px;
+            cursor: pointer; display: block;
+        }
+
+        /* REACTIONS */
+        .react-bar { display: flex; gap: 3px; margin-top: 3px; flex-wrap: wrap; }
+        .msg.my .react-bar { justify-content: flex-end; }
+        .react-btn {
+            display: flex; align-items: center; gap: 2px;
+            padding: 2px 7px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.03);
+            cursor: pointer; transition: 0.2s; font-size: 11px; color: #aaa;
+        }
+        .react-btn:hover { background: rgba(108,99,255,0.15); border-color: rgba(108,99,255,0.3); }
+        .react-btn.active { background: rgba(108,99,255,0.2); border-color: rgba(108,99,255,0.4); }
+        .react-btn .rcount { font-size: 10px; font-weight: 700; }
+        .react-btn .ricon { font-size: 13px; }
+
+        .add-react {
+            opacity: 0; transition: 0.2s;
+            position: absolute; right: -28px; top: 50%; transform: translateY(-50%);
+        }
+        .msg.my .add-react { right: auto; left: -28px; }
+        .msg:hover .add-react { opacity: 1; }
+        .add-react button {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: none; background: rgba(108,99,255,0.12);
+            color: #888; font-size: 11px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .add-react button:hover { background: rgba(108,99,255,0.3); color: #fff; }
+
+        .rpick {
+            display: none; position: absolute;
+            background: rgba(28,28,52,0.98);
+            border: 1px solid rgba(108,99,255,0.2);
+            border-radius: 12px; padding: 5px 7px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+            z-index: 200; white-space: nowrap;
+            bottom: 100%; left: 0; margin-bottom: 4px;
+        }
+        .rpick.on { display: flex; gap: 2px; animation: mIn 0.15s ease; }
+        .rpick button {
+            width: 30px; height: 30px; border: none;
+            background: transparent; font-size: 18px;
+            cursor: pointer; border-radius: 6px; transition: 0.15s;
+        }
+        .rpick button:hover { background: rgba(108,99,255,0.2); transform: scale(1.15); }
+
+        /* REPLY */
+        .reply-ref {
+            background: rgba(108,99,255,0.08);
+            border-left: 2px solid #6C63FF;
+            border-radius: 0 6px 6px 0;
+            padding: 3px 8px; margin-bottom: 4px;
+            font-size: 10px; cursor: pointer;
+        }
+        .reply-ref .rr-name { font-weight: 700; color: #6C63FF; font-size: 9px; }
+        .reply-ref .rr-text { color: #888; max-height: 16px; overflow: hidden; }
+
+        .sys { text-align: center; padding: 4px; }
+        .sys span {
+            background: rgba(108,99,255,0.07);
+            padding: 3px 10px; border-radius: 12px;
+            font-size: 10px; color: #666; display: inline-block;
+        }
+
+        /* TYPING */
+        .tbar {
+            padding: 2px 14px; font-size: 10px;
+            color: #666; font-style: italic;
+            min-height: 14px; flex-shrink: 0;
+        }
+
+        /* ===== INPUT BAR - CRITICAL FIX ===== */
+        .ibar {
+            background: rgba(20,20,40,0.99);
+            border-top: 1px solid rgba(108,99,255,0.1);
+            padding: 8px 12px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 30;
+            width: 100%;
+        }
+
+        /* EMOJI BOX */
+        .ebox {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 4px);
+            left: 8px;
+            right: 8px;
+            max-width: 320px;
+            background: rgba(28,28,52,0.99);
+            border: 1px solid rgba(108,99,255,0.18);
+            border-radius: 14px;
+            padding: 10px;
+            box-shadow: 0 -6px 30px rgba(0,0,0,0.5);
+            z-index: 300;
+        }
+        .ebox.on { display: block; animation: mIn 0.15s ease; }
+        .egrid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .egrid::-webkit-scrollbar { width: 3px; }
+        .egrid::-webkit-scrollbar-thumb { background: rgba(108,99,255,0.2); border-radius: 2px; }
+        .egrid button {
+            width: 100%; aspect-ratio: 1;
+            border: none; background: transparent;
+            font-size: 18px; cursor: pointer;
+            border-radius: 6px; transition: 0.15s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .egrid button:hover { background: rgba(108,99,255,0.2); transform: scale(1.12); }
+
+        /* REPLY PREVIEW */
+        .rp-prev {
+            display: none;
+            padding: 7px 10px;
+            background: rgba(108,99,255,0.08);
+            border-left: 3px solid #6C63FF;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 6px;
+            font-size: 11px;
+            position: relative;
+        }
+        .rp-prev.on { display: block; }
+        .rp-prev .rpn { font-weight: 700; color: #6C63FF; font-size: 10px; }
+        .rp-prev .rpt { color: #888; margin-top: 1px; max-height: 20px; overflow: hidden; }
+        .rp-prev .rpc {
+            position: absolute; right: 6px; top: 6px;
+            background: none; border: none; color: #888;
+            cursor: pointer; font-size: 14px; padding: 2px;
+        }
+
+        /* IMAGE PREVIEW */
+        .ipv {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 6px;
+        }
+        .ipv.on { display: flex; }
+        .ipv img {
+            width: 46px; height: 46px;
+            border-radius: 6px; object-fit: cover;
+            border: 2px solid #6C63FF;
+        }
+        .ipv button {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: none; background: rgba(255,60,60,0.2);
+            color: #ff5252; cursor: pointer; font-size: 11px;
+        }
+        .ipv small { color: #666; font-size: 10px; }
+
+        /* INPUT ROW */
+        .irow {
+            display: flex;
+            gap: 6px;
+            align-items: flex-end;
+            width: 100%;
+        }
+        .ibtns { display: flex; gap: 3px; flex-shrink: 0; }
+        .ib {
+            width: 36px; height: 36px;
+            border-radius: 10px; border: none;
+            background: rgba(108,99,255,0.12);
+            color: #6C63FF; font-size: 15px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s; flex-shrink: 0;
+        }
+        .ib:hover { background: rgba(108,99,255,0.22); }
+
+        .iwrap {
+            flex: 1;
+            min-width: 0;
+        }
+        .iwrap textarea {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0a0a16;
+            border: 2px solid rgba(108,99,255,0.12);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            resize: none;
+            height: 36px;
+            max-height: 80px;
+            font-family: inherit;
+            transition: 0.3s;
+            display: block;
+        }
+        .iwrap textarea:focus { border-color: #6C63FF; }
+
+        .sbtn {
+            width: 36px; height: 36px;
+            border-radius: 10px; border: none;
+            background: linear-gradient(135deg, #6C63FF, #5249cc);
+            color: #fff; font-size: 15px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s; flex-shrink: 0;
+            box-shadow: 0 3px 10px rgba(108,99,255,0.2);
+        }
+        .sbtn:hover { transform: scale(1.06); }
+
+        /* SCROLL BTN */
+        .sc-btn {
+            position: fixed;
+            bottom: 70px; right: 16px;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(108,99,255,0.85);
+            border: none; color: #fff;
+            font-size: 16px; cursor: pointer;
+            display: none; align-items: center; justify-content: center;
+            z-index: 40;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+        }
+        .sc-btn.on { display: flex; }
+
+        /* MODAL */
+        .modbg {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.94);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .modbg.on { display: flex; }
+        .modbg img { max-width: 92%; max-height: 92%; border-radius: 8px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sbar { display: none; }
+            .msg { max-width: 90%; }
+            .me-b span { display: none; }
+            .ch-top { padding: 8px 10px; }
+            .ch-top h2 { font-size: 15px; }
+            .m-list { padding: 10px; }
+            .ibar { padding: 6px 8px; }
+            .ib { width: 34px; height: 34px; font-size: 14px; }
+            .sbtn { width: 34px; height: 34px; font-size: 14px; }
+            .iwrap textarea { height: 34px; padding: 7px 10px; font-size: 13px; }
+            .msg .mbub img.mpc { max-width: 180px; max-height: 180px; }
+            .ebox { left: 4px; right: 4px; max-width: none; }
+            .sc-btn { bottom: 60px; right: 10px; }
+            .add-react { opacity: 0.6; }
+        }
+
+        @media (max-width: 360px) {
+            .ibtns { gap: 2px; }
+            .ib { width: 30px; height: 30px; font-size: 13px; border-radius: 8px; }
+            .sbtn { width: 30px; height: 30px; font-size: 13px; border-radius: 8px; }
+            .iwrap textarea { height: 30px; padding: 6px 8px; font-size: 12px; border-radius: 8px; }
+            .ibar { padding: 5px 6px; }
+            .irow { gap: 4px; }
+        }
+
+        /* Safari iOS fix */
+        @supports (-webkit-touch-callout: none) {
+            body { height: -webkit-fill-available; }
+            #chatScreen { height: -webkit-fill-available; }
+        }
     </style>
 </head>
 <body>
-
-<div class="dbg" id="dbg"></div>
 
 <!-- AUTH -->
 <div id="authScreen">
@@ -242,6 +642,7 @@
 
 <!-- CHAT -->
 <div id="chatScreen">
+    <!-- HEADER -->
     <div class="ch-top">
         <div class="ch-top-l">
             <h2>💬 TuMokena Kueto</h2>
@@ -252,37 +653,61 @@
             <button class="bt-out" onclick="doOut()">Sair</button>
         </div>
     </div>
-    <div class="status-bar" id="stBar"></div>
+
+    <!-- BODY -->
     <div class="ch-body">
+        <!-- SIDEBAR -->
         <div class="sbar">
             <h3>👥 Pessoas Online</h3>
             <div class="sbar-ls" id="sbL"></div>
         </div>
+
+        <!-- MESSAGES + INPUT -->
         <div class="m-area">
+            <!-- MESSAGES -->
             <div class="m-list" id="mL">
                 <div class="welcome-msg">
                     <div class="wicon">💬</div>
                     <h3>Bem-vindo ao TuMokena Kueto!</h3>
-                    <p>As mensagens da conversa aparecerão aqui. Comece a conversar!</p>
+                    <p>As mensagens aparecerão aqui.</p>
                 </div>
             </div>
+
+            <!-- TYPING -->
             <div class="tbar" id="tB"></div>
-            <div class="ibar">
-                <div class="ebox" id="eBox"><div class="egrid" id="eGr"></div></div>
-                <div class="reply-preview" id="rpPrev">
-                    <div class="rp-name" id="rpName"></div>
-                    <div class="rp-text" id="rpText"></div>
-                    <button class="rp-close" onclick="cancelReply()">✕</button>
+
+            <!-- INPUT BAR -->
+            <div class="ibar" id="inputBar">
+                <!-- EMOJI BOX -->
+                <div class="ebox" id="eBox">
+                    <div class="egrid" id="eGr"></div>
                 </div>
-                <div class="ipv" id="ipv"><img id="ipS"><button onclick="clrI()">✕</button><small style="color:#666">Pronta</small></div>
+
+                <!-- REPLY PREVIEW -->
+                <div class="rp-prev" id="rpPrev">
+                    <div class="rpn" id="rpN"></div>
+                    <div class="rpt" id="rpT"></div>
+                    <button class="rpc" onclick="cancelReply()">✕</button>
+                </div>
+
+                <!-- IMAGE PREVIEW -->
+                <div class="ipv" id="ipv">
+                    <img id="ipS">
+                    <button onclick="clrI()">✕</button>
+                    <small>Pronta</small>
+                </div>
+
+                <!-- INPUT ROW -->
                 <div class="irow">
                     <div class="ibtns">
-                        <button class="ib" onclick="togE()">😊</button>
-                        <button class="ib" onclick="document.getElementById('mF').click()">📎</button>
+                        <button class="ib" onclick="togE()" title="Emojis">😊</button>
+                        <button class="ib" onclick="document.getElementById('mF').click()" title="Imagem">📎</button>
                         <input type="file" id="mF" accept="image/*" style="display:none">
                     </div>
-                    <div class="iwrap"><textarea id="mI" placeholder="Escreva uma mensagem..." rows="1"></textarea></div>
-                    <button class="sbtn" onclick="sendM()">➤</button>
+                    <div class="iwrap">
+                        <textarea id="mI" placeholder="Escreva uma mensagem..." rows="1"></textarea>
+                    </div>
+                    <button class="sbtn" onclick="sendM()" title="Enviar">➤</button>
                 </div>
             </div>
         </div>
@@ -290,7 +715,7 @@
 </div>
 
 <!-- SCROLL BTN -->
-<button class="scroll-bot" id="scBtn" onclick="scD()">↓</button>
+<button class="sc-btn" id="scBtn" onclick="scD()">↓</button>
 
 <!-- MODAL -->
 <div class="modbg" id="modB" onclick="this.classList.remove('on')"><img id="modI"></div>
@@ -310,63 +735,76 @@ firebase.initializeApp({
     appId:"1:1020292216741:web:3049694b2cd63486ec5a4c"
 });
 
-const auth=firebase.auth(),db=firebase.firestore();
+const auth=firebase.auth(), db=firebase.firestore();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-let ME=null,MY=null,avB='',imB='',tTm=null,uM=null,uU=null,uT=null;
-let seen=new Set(),lastU='',replyTo=null,allMsgs={};
-let welcomeRemoved=false;
+let ME=null,MY=null,avB='',imB='',tTm=null;
+let uM=null,uU=null,uT=null;
+let seen=new Set(),lastU='',replyTo=null,allMsgs={},welc=false;
 
 const COLORS=['#6C63FF','#FF6584','#00C853','#FF9800','#00BCD4','#E040FB','#FF5252','#7C4DFF','#64FFDA','#FFD740','#F50057','#00E5FF','#76FF03','#FF6E40','#448AFF','#EA80FC','#B2FF59','#FF80AB','#40C4FF','#FFAB40'];
-const REACT_EMOJIS=['👍','👎','❤️','😂','😮','😢','🔥','👏'];
+const REACTS=['👍','👎','❤️','😂','😮','😢','🔥','👏'];
 const EMOJIS='😀😂🤣😊😍🥰😘😜🤪😎🤩🥳😏😤😠😱😢😭🥺😩👋👍👎👊✊🤝👏🙌💪🙏❤️🧡💛💚💙💜🖤🤍💯💥🔥⭐✨💫🎉🎊🎁🎈😇🤗🤔🤫🤭🙄😴😋😛🤓😈👻💀👽🤖🎃👀💬🫶🫡😅🙂🤷'.match(/./gu)||[];
 
 function pC(u){let h=0;for(let i=0;i<u.length;i++)h=u.charCodeAt(i)+((h<<5)-h);return COLORS[Math.abs(h)%COLORS.length]}
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
-function D(t){console.log('[TK]',t);document.getElementById('dbg').textContent=t}
 
-// AUTH UI
+/* ===== AUTH ===== */
 function goTab(t){
-    hid('aE');hid('aO');hid('aI');
-    if(t==='l'){document.getElementById('tL').classList.add('on');document.getElementById('tR').classList.remove('on');document.getElementById('fL').style.display='block';document.getElementById('fR').style.display='none'}
-    else{document.getElementById('tR').classList.add('on');document.getElementById('tL').classList.remove('on');document.getElementById('fR').style.display='block';document.getElementById('fL').style.display='none'}
+    hd('aE');hd('aO');hd('aI');
+    if(t==='l'){
+        document.getElementById('tL').classList.add('on');
+        document.getElementById('tR').classList.remove('on');
+        document.getElementById('fL').style.display='block';
+        document.getElementById('fR').style.display='none';
+    }else{
+        document.getElementById('tR').classList.add('on');
+        document.getElementById('tL').classList.remove('on');
+        document.getElementById('fR').style.display='block';
+        document.getElementById('fL').style.display='none';
+    }
 }
-function shE(m){const e=document.getElementById('aE');e.textContent=m;e.style.display='block';hid('aO');hid('aI')}
-function shO(m){const e=document.getElementById('aO');e.textContent=m;e.style.display='block';hid('aE');hid('aI')}
-function shI(m){const e=document.getElementById('aI');e.textContent=m;e.style.display='block';hid('aE');hid('aO')}
-function hid(id){document.getElementById(id).style.display='none'}
+function shE(m){document.getElementById('aE').textContent=m;document.getElementById('aE').style.display='block';hd('aO');hd('aI')}
+function shO(m){document.getElementById('aO').textContent=m;document.getElementById('aO').style.display='block';hd('aE');hd('aI')}
+function shI(m){document.getElementById('aI').textContent=m;document.getElementById('aI').style.display='block';hd('aE');hd('aO')}
+function hd(id){document.getElementById(id).style.display='none'}
 
 function comp(file,mW,q){
     return new Promise((res,rej)=>{
         const r=new FileReader();
-        r.onerror=()=>rej('Erro leitura');
+        r.onerror=()=>rej('Erro');
         r.onload=ev=>{
             const img=new Image();
-            img.onerror=()=>rej('Erro imagem');
+            img.onerror=()=>rej('Erro');
             img.onload=()=>{
                 const c=document.createElement('canvas'),rt=Math.min(mW/img.width,1);
                 c.width=img.width*rt;c.height=img.height*rt;
                 c.getContext('2d').drawImage(img,0,0,c.width,c.height);
                 res(c.toDataURL('image/jpeg',q));
-            };img.src=ev.target.result;
-        };r.readAsDataURL(file);
+            };
+            img.src=ev.target.result;
+        };
+        r.readAsDataURL(file);
     });
 }
 
 document.getElementById('avF').addEventListener('change',async function(e){
-    const f=e.target.files[0];if(!f)return;
-    if(f.size>2*1024*1024){shE('Imagem max 2MB');return}
-    try{shI('Processando...');avB=await comp(f,120,0.6);document.getElementById('avC').innerHTML='<img src="'+avB+'">';hid('aI')}catch(er){shE('Erro: '+er)}
+    const f=e.target.files[0]; if(!f)return;
+    if(f.size>2*1024*1024){shE('Max 2MB');return}
+    try{shI('Processando...');avB=await comp(f,120,0.6);document.getElementById('avC').innerHTML='<img src="'+avB+'">';hd('aI')}
+    catch(er){shE('Erro: '+er)}
 });
 
-// REGISTER
 async function doReg(){
-    const nm=document.getElementById('rN').value.trim(),em=document.getElementById('rE').value.trim(),pw=document.getElementById('rP').value;
-    if(!nm||nm.length<2){shE('Nome: mínimo 2 caracteres');return}
+    const nm=document.getElementById('rN').value.trim();
+    const em=document.getElementById('rE').value.trim();
+    const pw=document.getElementById('rP').value;
+    if(!nm||nm.length<2){shE('Nome: mín 2 caracteres');return}
     if(!em||!em.includes('@')){shE('E-mail inválido');return}
-    if(!pw||pw.length<6){shE('Senha: mínimo 6 caracteres');return}
+    if(!pw||pw.length<6){shE('Senha: mín 6 caracteres');return}
 
-    const btn=document.getElementById('bR');btn.disabled=true;btn.textContent='Criando...';shI('Verificando...');
+    const btn=document.getElementById('bR');
+    btn.disabled=true;btn.textContent='Criando...';shI('Verificando...');
 
     try{
         let exists=false;
@@ -375,19 +813,20 @@ async function doReg(){
 
         shI('Criando conta...');
         const cred=await auth.createUserWithEmailAndPassword(em,pw);
-        const uid=cred.user.uid,color=pC(uid);
-
-        shI('Salvando dados...');
-        await db.collection('users').doc(uid).set({username:nm,avatar:avB||'',color:color,online:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-        D('Conta criada!');shO('Conta criada!');
+        shI('Salvando...');
+        await db.collection('users').doc(cred.user.uid).set({
+            username:nm,avatar:avB||'',color:pC(cred.user.uid),
+            online:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()
+        });
+        shO('Conta criada!');
     }catch(er){
-        D('ERRO: '+er.code);
         let m='Erro ao criar conta.';
         switch(er.code){
             case 'auth/email-already-in-use':m='E-mail já registado!';break;
-            case 'auth/weak-password':m='Senha muito fraca!';break;
+            case 'auth/weak-password':m='Senha fraca!';break;
             case 'auth/invalid-email':m='E-mail inválido!';break;
-            case 'auth/operation-not-allowed':case 'auth/admin-restricted-operation':m='⚠️ ATIVE Email/Password no Firebase Console → Authentication → Sign-in method';break;
+            case 'auth/operation-not-allowed':case 'auth/admin-restricted-operation':
+                m='⚠️ Ative Email/Password no Firebase Console → Authentication → Sign-in method';break;
             case 'auth/network-request-failed':m='Sem internet!';break;
             default:m='Erro: '+(er.message||er.code);
         }
@@ -395,17 +834,16 @@ async function doReg(){
     }
 }
 
-// LOGIN
 async function doLogin(){
     const em=document.getElementById('lE').value.trim(),pw=document.getElementById('lP').value;
-    if(!em||!pw){shE('Preencha todos os campos');return}
+    if(!em||!pw){shE('Preencha tudo');return}
     const btn=document.getElementById('bL');btn.disabled=true;btn.textContent='Entrando...';shI('Conectando...');
-    try{await auth.signInWithEmailAndPassword(em,pw)}catch(er){
+    try{await auth.signInWithEmailAndPassword(em,pw)}
+    catch(er){
         let m='Erro ao entrar.';
         switch(er.code){
             case 'auth/user-not-found':m='Conta não encontrada!';break;
             case 'auth/wrong-password':case 'auth/invalid-credential':m='E-mail ou senha incorretos!';break;
-            case 'auth/invalid-email':m='E-mail inválido!';break;
             case 'auth/too-many-requests':m='Muitas tentativas. Aguarde.';break;
             case 'auth/network-request-failed':m='Sem internet!';break;
             default:m='Erro: '+(er.message||er.code);
@@ -414,7 +852,6 @@ async function doLogin(){
     }
 }
 
-// LOGOUT
 async function doOut(){
     try{
         if(ME&&MY){
@@ -423,25 +860,23 @@ async function doOut(){
             await db.collection('messages').add({type:'sys',text:MY.username+' saiu do chat',ts:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
         }
     }catch(e){}
-    if(uM)uM();if(uU)uU();if(uT)uT();uM=uU=uT=null;
-    seen.clear();lastU='';allMsgs={};replyTo=null;welcomeRemoved=false;
+    if(uM)uM();if(uU)uU();if(uT)uT();
+    uM=uU=uT=null;seen.clear();lastU='';allMsgs={};replyTo=null;welc=false;
     await auth.signOut();
 }
 
-// AUTH STATE
 auth.onAuthStateChanged(async user=>{
-    D('Auth: '+(user?user.uid:'none'));
     if(user){
         ME=user;
         try{
-            const doc=await db.collection('users').doc(user.uid).get();
-            if(!doc.exists){await new Promise(r=>setTimeout(r,2000));const d2=await db.collection('users').doc(user.uid).get();if(d2.exists){MY=d2.data()}else{shE('Dados não encontrados');await auth.signOut();return}}
-            else{MY=doc.data()}
-
+            let doc=await db.collection('users').doc(user.uid).get();
+            if(!doc.exists){await new Promise(r=>setTimeout(r,2000));doc=await db.collection('users').doc(user.uid).get()}
+            if(!doc.exists){shE('Dados não encontrados');await auth.signOut();return}
+            MY=doc.data();
             await db.collection('users').doc(user.uid).update({online:true}).catch(()=>{});
             await db.collection('messages').add({type:'sys',text:MY.username+' entrou no chat 👋',ts:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
             openChat();
-        }catch(e){D('Erro: '+e.message);shE('Erro: '+e.message)}
+        }catch(e){shE('Erro: '+e.message)}
     }else{
         ME=null;MY=null;
         document.getElementById('authScreen').classList.remove('off');
@@ -449,24 +884,35 @@ auth.onAuthStateChanged(async user=>{
         const b1=document.getElementById('bL'),b2=document.getElementById('bR');
         if(b1){b1.disabled=false;b1.textContent='Entrar'}
         if(b2){b2.disabled=false;b2.textContent='Criar Conta'}
-        hid('aI');
+        hd('aI');
     }
 });
 
 window.addEventListener('beforeunload',()=>{
-    if(ME){db.collection('users').doc(ME.uid).update({online:false}).catch(()=>{});db.collection('typing').doc(ME.uid).delete().catch(()=>{})}
+    if(ME){
+        db.collection('users').doc(ME.uid).update({online:false}).catch(()=>{});
+        db.collection('typing').doc(ME.uid).delete().catch(()=>{});
+    }
 });
-document.addEventListener('visibilitychange',()=>{if(ME)db.collection('users').doc(ME.uid).update({online:!document.hidden}).catch(()=>{})});
 
-// OPEN CHAT
+document.addEventListener('visibilitychange',()=>{
+    if(ME)db.collection('users').doc(ME.uid).update({online:!document.hidden}).catch(()=>{});
+});
+
+/* ===== CHAT ===== */
 function openChat(){
-    D('Abrindo chat...');
     document.getElementById('authScreen').classList.add('off');
     document.getElementById('chatScreen').classList.add('on');
     updMe();
-    document.getElementById('mL').innerHTML='<div class="welcome-msg"><div class="wicon">💬</div><h3>Bem-vindo ao TuMokena Kueto!</h3><p>As mensagens aparecerão aqui.</p></div>';
-    seen.clear();lastU='';allMsgs={};welcomeRemoved=false;
-    startListen();buildEm();setupIn();D('Chat pronto!');
+    document.getElementById('mL').innerHTML='<div class="welcome-msg"><div class="wicon">💬</div><h3>Bem-vindo!</h3><p>As mensagens aparecerão aqui.</p></div>';
+    seen.clear();lastU='';allMsgs={};welc=false;
+    startListen();buildEm();setupIn();
+
+    // Force layout recalc
+    setTimeout(()=>{
+        window.dispatchEvent(new Event('resize'));
+        scD();
+    },300);
 }
 
 function updMe(){
@@ -475,35 +921,34 @@ function updMe(){
     else el.innerHTML='<div class="ml" style="background:'+MY.color+'">'+MY.username.charAt(0).toUpperCase()+'</div><span>'+esc(MY.username)+'</span>';
 }
 
-// LISTENERS
 function startListen(){
     if(uM)uM();
     uM=db.collection('messages').orderBy('ts','asc').limitToLast(200).onSnapshot(snap=>{
         snap.docChanges().forEach(ch=>{
             if(ch.type==='added'&&!seen.has(ch.doc.id)){
                 seen.add(ch.doc.id);
-                const d=ch.doc.data();
-                allMsgs[ch.doc.id]=d;
-                addM(d,ch.doc.id);
+                allMsgs[ch.doc.id]=ch.doc.data();
+                addM(ch.doc.data(),ch.doc.id);
             }
             if(ch.type==='modified'){
                 allMsgs[ch.doc.id]=ch.doc.data();
-                updReactions(ch.doc.id,ch.doc.data());
+                updR(ch.doc.id,ch.doc.data());
             }
         });
         scD();
-    },er=>D('Err msgs: '+er.message));
+    });
 
     if(uU)uU();
     uU=db.collection('users').where('online','==',true).onSnapshot(snap=>{
         const ls=document.getElementById('sbL');ls.innerHTML='';let n=0;
         snap.forEach(doc=>{
             const d=doc.data();n++;const c=d.color||pC(doc.id),me=doc.id===ME?.uid;
-            let av=d.avatar?'<img src="'+d.avatar+'" style="border:2px solid '+c+'">':'<div class="sl" style="background:'+c+'">'+(d.username||'?').charAt(0).toUpperCase()+'</div>';
+            let av=d.avatar?'<img src="'+d.avatar+'" style="border:2px solid '+c+'">':
+                '<div class="sl" style="background:'+c+'">'+(d.username||'?').charAt(0).toUpperCase()+'</div>';
             ls.innerHTML+='<div class="su">'+av+'<div><div class="sn" style="color:'+c+'">'+esc(d.username)+(me?' (eu)':'')+'</div><div class="ss">● Online</div></div></div>';
         });
         document.getElementById('bOn').textContent=n+' online';
-    },er=>D('Err users: '+er.message));
+    });
 
     if(uT)uT();
     uT=db.collection('typing').onSnapshot(snap=>{
@@ -511,15 +956,13 @@ function startListen(){
         snap.forEach(doc=>{if(doc.id!==ME?.uid){const d=doc.data();if(d.name)ns.push(d.name)}});
         const b=document.getElementById('tB');
         if(ns.length===1)b.textContent=ns[0]+' está digitando...';
-        else if(ns.length===2)b.textContent=ns[0]+' e '+ns[1]+' estão digitando...';
-        else if(ns.length>2)b.textContent=ns.length+' pessoas digitando...';
+        else if(ns.length>1)b.textContent=ns.length+' pessoas digitando...';
         else b.textContent='';
-    },er=>D('Err type: '+er.message));
+    });
 }
 
-// RENDER MSG
 function addM(d,id){
-    if(!welcomeRemoved){document.getElementById('mL').innerHTML='';welcomeRemoved=true}
+    if(!welc){document.getElementById('mL').innerHTML='';welc=true}
     const ls=document.getElementById('mL');
 
     if(d.type==='sys'){
@@ -529,182 +972,118 @@ function addM(d,id){
     }
 
     const mine=d.uid===ME?.uid,same=d.uid===lastU,color=d.color||'#6C63FF';
-
     const div=document.createElement('div');
     div.className='msg'+(mine?' my':'')+(!same?' gs':'');
     div.id='msg-'+id;
-    div.setAttribute('data-id',id);
 
     let tm='';
     if(d.ts&&d.ts.toDate)tm=d.ts.toDate().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
-    // Avatar
-    let avH;
-    if(!same){
-        avH=d.avatar?'<img class="mav" src="'+d.avatar+'" style="border:2px solid '+color+'">':'<div class="mlt" style="background:'+color+'">'+(d.name||'?').charAt(0).toUpperCase()+'</div>';
-    }else{avH='<div class="msp"></div>'}
+    let avH=!same?(d.avatar?'<img class="mav" src="'+d.avatar+'" style="border:2px solid '+color+'">':
+        '<div class="mlt" style="background:'+color+'">'+(d.name||'?').charAt(0).toUpperCase()+'</div>'):
+        '<div class="msp"></div>';
 
     let nmH=!same?'<div class="mwh" style="color:'+color+'">'+esc(d.name||'Anónimo')+'</div>':'';
 
-    // Reply ref
     let replyH='';
     if(d.replyId&&allMsgs[d.replyId]){
         const rd=allMsgs[d.replyId];
         replyH='<div class="reply-ref" onclick="scrollToMsg(\''+d.replyId+'\')"><div class="rr-name">'+esc(rd.name||'')+'</div><div class="rr-text">'+esc((rd.text||'📷 Imagem').substring(0,50))+'</div></div>';
     }
 
-    // Content
     let cont=replyH;
     if(d.text)cont+='<div>'+esc(d.text)+'</div>';
     if(d.img)cont+='<img class="mpc" src="'+d.img+'" onclick="openMod(this.src)" loading="lazy">';
     cont+='<span class="mtm">'+tm+'</span>';
 
-    // Reactions
-    const rBar=buildReactBar(d,id);
-
+    const rBar=bldR(d,id);
     const bSt=mine?'background:'+color+';':'';
 
-    div.innerHTML=avH+
-        '<div class="mwr">'+nmH+
-        '<div class="mbub" style="'+bSt+'">'+cont+'</div>'+
-        rBar+
-        '<div class="add-react"><button onclick="showReactPick(event,\''+id+'\')">😀</button></div>'+
-        '</div>';
+    div.innerHTML=avH+'<div class="mwr" style="position:relative">'+nmH+
+        '<div class="mbub" style="'+bSt+'">'+cont+'</div>'+rBar+
+        '<div class="add-react"><button onclick="showRP(event,\''+id+'\')">😀</button></div></div>';
 
     ls.appendChild(div);lastU=d.uid;
 
-    // Double tap / long press for reply on mobile
-    let pressTimer;
-    div.addEventListener('touchstart',()=>{pressTimer=setTimeout(()=>setReply(id,d),500)});
-    div.addEventListener('touchend',()=>clearTimeout(pressTimer));
-    div.addEventListener('touchmove',()=>clearTimeout(pressTimer));
-
-    // Double click for reply on desktop
+    // Long press for reply
+    let pt;
+    div.addEventListener('touchstart',()=>{pt=setTimeout(()=>setReply(id,d),500)},{passive:true});
+    div.addEventListener('touchend',()=>clearTimeout(pt));
+    div.addEventListener('touchmove',()=>clearTimeout(pt));
     div.addEventListener('dblclick',()=>setReply(id,d));
 }
 
-// REACTIONS
-function buildReactBar(d,id){
-    const reactions=d.reactions||{};
-    const rKeys=Object.keys(reactions);
-    if(rKeys.length===0)return '<div class="react-bar" id="rb-'+id+'"></div>';
-
+/* REACTIONS */
+function bldR(d,id){
+    const rx=d.reactions||{};const ks=Object.keys(rx);
     let html='<div class="react-bar" id="rb-'+id+'">';
-    // Agrupa por emoji
-    const counts={};
-    const userReacts={};
-    rKeys.forEach(uid=>{
-        const emoji=reactions[uid];
-        if(!counts[emoji])counts[emoji]=0;
-        counts[emoji]++;
-        if(uid===ME?.uid)userReacts[emoji]=true;
-    });
-
-    Object.keys(counts).forEach(emoji=>{
-        const active=userReacts[emoji]?'active':'';
-        html+='<div class="react-btn '+active+'" onclick="toggleReact(\''+id+'\',\''+emoji+'\')">';
-        html+='<span class="ricon">'+emoji+'</span>';
-        html+='<span class="rcount">'+counts[emoji]+'</span>';
-        html+='</div>';
-    });
-
-    html+='</div>';
-    return html;
+    if(ks.length>0){
+        const cn={},ur={};
+        ks.forEach(uid=>{const e=rx[uid];cn[e]=(cn[e]||0)+1;if(uid===ME?.uid)ur[e]=true});
+        Object.keys(cn).forEach(e=>{
+            html+='<div class="react-btn '+(ur[e]?'active':'')+'" onclick="togR(\''+id+'\',\''+e+'\')"><span class="ricon">'+e+'</span><span class="rcount">'+cn[e]+'</span></div>';
+        });
+    }
+    return html+'</div>';
 }
 
-function updReactions(id,d){
-    const el=document.getElementById('rb-'+id);
-    if(!el)return;
-
-    const reactions=d.reactions||{};
-    const rKeys=Object.keys(reactions);
-
-    if(rKeys.length===0){el.innerHTML='';return}
-
-    const counts={};
-    const userReacts={};
-    rKeys.forEach(uid=>{
-        const emoji=reactions[uid];
-        if(!counts[emoji])counts[emoji]=0;
-        counts[emoji]++;
-        if(uid===ME?.uid)userReacts[emoji]=true;
+function updR(id,d){
+    const el=document.getElementById('rb-'+id);if(!el)return;
+    const rx=d.reactions||{};const ks=Object.keys(rx);
+    if(ks.length===0){el.innerHTML='';return}
+    const cn={},ur={};
+    ks.forEach(uid=>{const e=rx[uid];cn[e]=(cn[e]||0)+1;if(uid===ME?.uid)ur[e]=true});
+    let h='';
+    Object.keys(cn).forEach(e=>{
+        h+='<div class="react-btn '+(ur[e]?'active':'')+'" onclick="togR(\''+id+'\',\''+e+'\')"><span class="ricon">'+e+'</span><span class="rcount">'+cn[e]+'</span></div>';
     });
-
-    let html='';
-    Object.keys(counts).forEach(emoji=>{
-        const active=userReacts[emoji]?'active':'';
-        html+='<div class="react-btn '+active+'" onclick="toggleReact(\''+id+'\',\''+emoji+'\')">';
-        html+='<span class="ricon">'+emoji+'</span>';
-        html+='<span class="rcount">'+counts[emoji]+'</span>';
-        html+='</div>';
-    });
-    el.innerHTML=html;
+    el.innerHTML=h;
 }
 
-async function toggleReact(msgId,emoji){
+async function togR(mid,emoji){
     if(!ME)return;
-    const ref=db.collection('messages').doc(msgId);
     try{
-        const doc=await ref.get();
-        if(!doc.exists)return;
-        const data=doc.data();
-        const reactions=data.reactions||{};
-
-        if(reactions[ME.uid]===emoji){
-            // Remove reaction
-            delete reactions[ME.uid];
-        }else{
-            // Add/change reaction
-            reactions[ME.uid]=emoji;
-        }
-        await ref.update({reactions:reactions});
-    }catch(e){D('Err react: '+e.message)}
+        const ref=db.collection('messages').doc(mid);
+        const doc=await ref.get();if(!doc.exists)return;
+        const rx=doc.data().reactions||{};
+        if(rx[ME.uid]===emoji)delete rx[ME.uid];
+        else rx[ME.uid]=emoji;
+        await ref.update({reactions:rx});
+    }catch(e){}
 }
 
-function showReactPick(event,msgId){
+function showRP(event,mid){
     event.stopPropagation();
-    // Remove any existing picker
     document.querySelectorAll('.rpick').forEach(p=>p.remove());
 
     const pick=document.createElement('div');
     pick.className='rpick on';
 
-    REACT_EMOJIS.forEach(em=>{
-        const b=document.createElement('button');
-        b.textContent=em;
-        b.onclick=(e)=>{
-            e.stopPropagation();
-            toggleReact(msgId,em);
-            pick.remove();
-        };
+    REACTS.forEach(em=>{
+        const b=document.createElement('button');b.textContent=em;
+        b.onclick=e=>{e.stopPropagation();togR(mid,em);pick.remove()};
         pick.appendChild(b);
     });
 
-    const msgEl=document.getElementById('msg-'+msgId);
+    const msgEl=document.getElementById('msg-'+mid);
     if(msgEl){
         const wrap=msgEl.querySelector('.mwr');
-        if(wrap){
-            pick.style.position='absolute';
-            pick.style.zIndex='200';
-            wrap.style.position='relative';
-            wrap.appendChild(pick);
-        }
+        if(wrap)wrap.appendChild(pick);
     }
 
-    // Close on outside click
     setTimeout(()=>{
-        document.addEventListener('click',function closer(){
-            pick.remove();
-            document.removeEventListener('click',closer);
-        },{once:false});
-    },100);
+        const closer=e=>{
+            if(!pick.contains(e.target)){pick.remove();document.removeEventListener('click',closer)}
+        };
+        document.addEventListener('click',closer);
+    },50);
 }
 
-// REPLY
+/* REPLY */
 function setReply(id,d){
-    replyTo={id:id,name:d.name||'',text:d.text||'📷 Imagem'};
-    document.getElementById('rpName').textContent='↩ Respondendo a '+replyTo.name;
-    document.getElementById('rpText').textContent=replyTo.text.substring(0,60);
+    replyTo={id,name:d.name||'',text:d.text||'📷 Imagem'};
+    document.getElementById('rpN').textContent='↩ '+replyTo.name;
+    document.getElementById('rpT').textContent=replyTo.text.substring(0,60);
     document.getElementById('rpPrev').classList.add('on');
     document.getElementById('mI').focus();
 }
@@ -719,66 +1098,68 @@ function scrollToMsg(id){
     if(el){
         el.scrollIntoView({behavior:'smooth',block:'center'});
         el.style.background='rgba(108,99,255,0.12)';
-        setTimeout(()=>{el.style.background=''},1500);
+        setTimeout(()=>el.style.background='',1500);
     }
 }
 
 function scD(){
     const el=document.getElementById('mL');
-    setTimeout(()=>{el.scrollTop=el.scrollHeight},60);
+    if(el)setTimeout(()=>{el.scrollTop=el.scrollHeight},80);
 }
 
-// Scroll button
-document.addEventListener('DOMContentLoaded',()=>{
-    const ml=document.getElementById('mL');
-    if(ml){
-        ml.addEventListener('scroll',()=>{
-            const sb=document.getElementById('scBtn');
-            if(ml.scrollHeight-ml.scrollTop-ml.clientHeight>200)sb.classList.add('on');
-            else sb.classList.remove('on');
-        });
-    }
-});
-
-// SEND
+/* SEND */
 async function sendM(){
     const inp=document.getElementById('mI'),txt=inp.value.trim();
     if(!txt&&!imB)return;if(!ME||!MY)return;
 
-    const data={uid:ME.uid,name:MY.username,avatar:MY.avatar||'',color:MY.color||pC(ME.uid),text:txt,img:imB||'',ts:firebase.firestore.FieldValue.serverTimestamp(),type:'msg',reactions:{}};
+    const data={
+        uid:ME.uid,name:MY.username,avatar:MY.avatar||'',
+        color:MY.color||pC(ME.uid),text:txt,img:imB||'',
+        ts:firebase.firestore.FieldValue.serverTimestamp(),
+        type:'msg',reactions:{}
+    };
 
-    if(replyTo){data.replyId=replyTo.id;data.replyName=replyTo.name;data.replyText=replyTo.text}
+    if(replyTo){data.replyId=replyTo.id}
 
-    inp.value='';inp.style.height='38px';clrI();cancelReply();
+    inp.value='';inp.style.height='36px';clrI();cancelReply();
     db.collection('typing').doc(ME.uid).delete().catch(()=>{});
 
-    try{await db.collection('messages').add(data)}catch(e){D('Err send: '+e.message)}
+    try{await db.collection('messages').add(data)}catch(e){}
 }
 
-// IMAGE
+/* IMAGE */
 document.getElementById('mF').addEventListener('change',async function(e){
     const f=e.target.files[0];if(!f)return;
-    if(f.size>5*1024*1024){alert('Máx 5MB');return}
-    try{imB=await comp(f,500,0.5);document.getElementById('ipS').src=imB;document.getElementById('ipv').classList.add('on')}catch(er){alert('Erro imagem')}
+    if(f.size>5*1024*1024){alert('Max 5MB');return}
+    try{imB=await comp(f,500,0.5);document.getElementById('ipS').src=imB;document.getElementById('ipv').classList.add('on')}
+    catch(er){alert('Erro')}
     e.target.value='';
 });
 
 function clrI(){imB='';document.getElementById('ipv').classList.remove('on')}
 
-// INPUT
+/* INPUT */
 function setupIn(){
     const inp=document.getElementById('mI');
-    inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendM()}});
+    inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendM()}
+    });
     inp.addEventListener('input',()=>{
-        inp.style.height='38px';inp.style.height=Math.min(inp.scrollHeight,90)+'px';
+        inp.style.height='36px';
+        inp.style.height=Math.min(inp.scrollHeight,80)+'px';
         if(!ME||!MY)return;
         db.collection('typing').doc(ME.uid).set({name:MY.username,t:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
         if(tTm)clearTimeout(tTm);
         tTm=setTimeout(()=>{db.collection('typing').doc(ME.uid).delete().catch(()=>{})},3000);
     });
+
+    // Prevent iOS zoom on focus
+    inp.addEventListener('focus',()=>{
+        setTimeout(()=>scD(),300);
+    });
 }
 
-// EMOJIS
+/* EMOJIS */
 function buildEm(){
     const g=document.getElementById('eGr');g.innerHTML='';
     EMOJIS.forEach(em=>{
@@ -795,32 +1176,51 @@ document.addEventListener('click',e=>{
     if(b&&b.classList.contains('on')&&!e.target.closest('.ebox')&&!e.target.closest('.ib'))b.classList.remove('on');
 });
 
-// MODAL
+/* MODAL */
 function openMod(s){document.getElementById('modI').src=s;document.getElementById('modB').classList.add('on')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('modB').classList.remove('on');document.getElementById('eBox').classList.remove('on')}});
 
-// ENTER auth
+document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+        document.getElementById('modB').classList.remove('on');
+        document.getElementById('eBox').classList.remove('on');
+    }
+});
+
+/* SCROLL BTN */
+const mList=document.getElementById('mL');
+if(mList){
+    mList.addEventListener('scroll',()=>{
+        const sb=document.getElementById('scBtn');
+        if(mList.scrollHeight-mList.scrollTop-mList.clientHeight>150)sb.classList.add('on');
+        else sb.classList.remove('on');
+    });
+}
+
+/* ENTER auth */
 ['lE','lP'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})});
 ['rN','rE','rP'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doReg()})});
 
-// CLEANUP
-setInterval(()=>{db.collection('typing').get().then(s=>{s.forEach(d=>{const dt=d.data();if(dt.t&&dt.t.toDate&&Date.now()-dt.t.toDate().getTime()>10000)d.ref.delete().catch(()=>{})})}).catch(()=>{})},20000);
+/* CLEANUP */
+setInterval(()=>{
+    db.collection('typing').get().then(s=>{
+        s.forEach(d=>{
+            const dt=d.data();
+            if(dt.t&&dt.t.toDate&&Date.now()-dt.t.toDate().getTime()>10000)
+                d.ref.delete().catch(()=>{});
+        });
+    }).catch(()=>{});
+},20000);
 
-// SOUND notification
-function playNotifSound(){
-    try{
-        const ctx=new(window.AudioContext||window.webkitAudioContext)();
-        const osc=ctx.createOscillator();
-        const gain=ctx.createGain();
-        osc.connect(gain);gain.connect(ctx.destination);
-        osc.frequency.value=800;osc.type='sine';
-        gain.gain.setValueAtTime(0.08,ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
-        osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.3);
-    }catch(e){}
+/* HANDLE RESIZE - iOS keyboard */
+function handleResize(){
+    const vh=window.innerHeight;
+    document.getElementById('chatScreen').style.height=vh+'px';
 }
+window.addEventListener('resize',handleResize);
+window.addEventListener('orientationchange',()=>setTimeout(handleResize,200));
+handleResize();
 
-D('TuMokena Kueto carregado!');
+console.log('💬 TuMokena Kueto pronto!');
 </script>
 </body>
 </html>
